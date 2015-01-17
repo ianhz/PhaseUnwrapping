@@ -10,6 +10,7 @@
 #define __unwrapping__Util__
 
 #include <stdio.h>
+#include <math.h>
 #include <iostream>
 
 float * loadCSV( std::string filepath, int h, int w );
@@ -18,5 +19,7 @@ void saveCSVFloat( float * solution, std::string filepath, int h, int w );
 void saveCSV( double * solution, std::string filepath, int h, int w );
 void saveCSVChar( unsigned char * solution, std::string filepath, int h, int w );
 void saveCSVInt( int * solution, std::string filepath, int h, int w );
+double EuclideanDistance(int i1, int j1, int i2, int j2);
+
 
 #endif /* defined(__unwrapping__Util__) */

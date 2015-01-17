@@ -131,3 +131,8 @@ void saveCSVInt( int * solution, std::string filepath, int h, int w )
     
     fclose(fp);
 }
+
+double EuclideanDistance(int i1, int j1, int i2, int j2)
+{
+    return sqrtf( powf(i1-i2, 2) + powf(j1-j2,2) );
+}

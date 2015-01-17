@@ -10,54 +10,80 @@
 #include "pi.h"
 #include "Residue.h"
 
-int SearchForResidues( float * imageData, unsigned char * bitMap, int w, int h)
+int SearchForResidues( float * imageData, unsigned char * bitMap, std::vector<Point>& pos_residues, std::vector<Point>& neg_residues, int w, int h )
 {
     int nPos = 0, nRes = 0;
     
-    for( unsigned int i = 1; i < h - 1; ++ i )
+    for( unsigned int i = 1; i < h-1 ; ++i )
     {
-        for( unsigned int j = 1; j < w - 1; ++j )
+        for( unsigned int j = 1; j < w-1; ++j )
         {
-            float difference = 0.0;
-            
-            float parcel = imageData[ (i+1)*w + j ] - imageData[ i*w + j ];
-            
-            if(parcel < -PI)
-                parcel += TWOPI;
-            else if(parcel >= PI)
-                parcel -= TWOPI;
-            
-            difference += parcel;
-            
-            parcel = imageData[ (i+1)*w + (j+1) ] - imageData[ (i+1)*w + j ];
-            
-            if(parcel < -PI)
-                parcel += TWOPI;
-            else if(parcel >= PI)
-                parcel -= TWOPI;
-            
-            difference += parcel;
-            
-            parcel = imageData[ i*w + (j+1) ] - imageData[ (i+1)*w + (j+1) ];
-            
-            if(parcel < -PI)
-                parcel += TWOPI;
-            else if(parcel >= PI)
-                parcel -= TWOPI;
-            
-            difference += parcel;
-            
-            parcel= imageData[ i*w + j ] - imageData[ i*w + (j+1) ];
-            
-            if(difference >= TWOPI)
+            if( bitMap[ i*w + j ] == FREE_PIXEL )
             {
-                bitMap[ i*w + j ] = POS_RESIDUE;
-                nPos++;
-            }
-            else if( difference <= -TWOPI)
-            {
-                bitMap[ i*w + j ] = NEG_RESIDUE;
-                nRes++;
+                double difference = 0.0;
+                
+                double parcel = (double)imageData[ (i+1)*w + j ] - (double)imageData[ i*w + j ];
+                
+                if( parcel <= -PI )
+                    parcel += TWOPI;
+                else if(parcel > PI )
+                    parcel -= TWOPI;
+                
+                difference += parcel;
+                
+                parcel = (double)imageData[ (i+1)*w + (j+1) ] - (double)imageData[ (i+1)*w + j ];
+                
+                if( parcel <= -PI  )
+                    parcel += TWOPI;
+                else if(parcel > PI )
+                    parcel -= TWOPI;
+                
+                difference += parcel;
+                
+                parcel = (double)imageData[ i*w + (j+1) ] - (double)imageData[ (i+1)*w + (j+1) ];
+                
+                if( parcel <= -PI  )
+                    parcel += TWOPI;
+                else if(parcel > PI )
+                    parcel -= TWOPI;
+                
+                difference += parcel;
+                
+                parcel = (double)imageData[ i*w + j ] - (double)imageData[ i*w + (j+1) ];
+                
+                if( parcel <= -PI  )
+                    parcel += TWOPI;
+                else if(parcel > PI  )
+                    parcel -= TWOPI;
+                
+                difference += parcel;
+                
+                if( difference == TWOPI )
+                {
+                    bitMap[ i*w + j ] = POS_RESIDUE;
+                    
+                    Point res;
+                    res.i = i;
+                    res.j = j;
+                    res.type = POS_RESIDUE;
+                    
+                    pos_residues.push_back(res);
+                    
+                    nPos++;
+                }
+                else if( difference == -TWOPI )
+                {
+                    bitMap[ i*w + j ] = NEG_RESIDUE;
+                    
+                    Point res;
+                    res.i = i;
+                    res.j = j;
+                    res.type = NEG_RESIDUE;
+                    
+                    neg_residues.push_back(res);
+                    
+                    nRes++;
+                }
             }
         }
     }
