@@ -9,8 +9,8 @@
 #include "LocalSearch.h"
 
 #define OPT_NEIGHBORHOOD 2
-#define MAX_TRIES 50
-#define MAX_DIST 10
+#define MAX_TRIES 10
+#define MAX_DIST 30
 
 /* Clones the given solution */
 void CloneSolution(std::vector<Group> s, std::vector<Group>& d)
