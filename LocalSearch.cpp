@@ -10,7 +10,7 @@
 
 #define OPT_NEIGHBORHOOD 2
 #define MAX_TRIES 10
-#define MAX_DIST 30
+#define MAX_DIST 40
 
 /* Clones the given solution */
 void CloneSolution(std::vector<Group> s, std::vector<Group>& d)
@@ -67,7 +67,10 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
     bool wasImprooved = false;
     srand(time(NULL));
     
-    int nTries = 0;
+    char ** dontLook = (char **)malloc(k * sizeof(char *));
+    for( unsigned int i = 0; i < k; i++ )
+        dontLook[i] = (char *)malloc(k * sizeof(char));
+    int combinations = 0;
     
     while(!wasImprooved)
     {
@@ -80,6 +83,13 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
             
             while( g2 == g1 )
                 g2 = rand() % k;
+            
+            if( dontLook[g1][g2] == 1 || dontLook[g2][g1] == 1)
+                continue;
+            
+            dontLook[g1][g2] = 1;
+            dontLook[g2][g1] = 1;
+            combinations++;
             
             if(neighborSolution[g1].points.size() == 0 || neighborSolution[g2].points.size() == 0)
                 continue;
@@ -136,12 +146,16 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
                     }
                 }
             }
-            
-            if(!wasImprooved)
-                nTries++;
         }
         
-        if( nTries > MAX_TRIES )
+        /* All combinations already computed */
+        if( combinations == k*k )
             break;
     }
+    
+    /* Clean up */
+    for( unsigned int i = 0; i < k; i++ )
+        free(dontLook[i]);
+    
+    free(dontLook);
 }
