@@ -136,3 +136,27 @@ double EuclideanDistance(int i1, int j1, int i2, int j2)
 {
     return sqrtf( powf(i1-i2, 2) + powf(j1-j2,2) );
 }
+
+void SaveBitmap( unsigned char * imgData, int w, int h, std::string filePath )
+{
+    Image * img = imgCreate(w, h, 3);
+    
+    for( unsigned int i = 0; i < h; ++i )
+    {
+        for( unsigned j = 0; j < w; ++j )
+        {
+            if(imgData[ i*w + j] == BRANCH_CUT)
+                imgSetPixel3f(img, j, i, 0, 255, 0);
+            else if(imgData[ i*w + j] == POS_RESIDUE )
+                imgSetPixel3f(img, j, i, 0, 0, 255);
+            else if( imgData[ i*w + j] == NEG_RESIDUE )
+                imgSetPixel3f(img, j, i, 255, 0, 0);
+            else
+                imgSetPixel3f(img, j, i, 255, 255, 255);
+        }
+    }
+    
+    std::string path = filePath + "_RESIDUE.bmp";
+    imgWriteBMP( (char *)path.c_str(), img);
+
+}

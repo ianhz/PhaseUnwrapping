@@ -11,7 +11,9 @@
 
 #include <stdio.h>
 #include <math.h>
+#include "ImageHandler.h"
 #include <iostream>
+#include "Residue.h"
 
 float * loadCSV( std::string filepath, int h, int w );
 unsigned char * loadCSVChar( std::string filepath, int h, int w );
@@ -20,6 +22,7 @@ void saveCSV( double * solution, std::string filepath, int h, int w );
 void saveCSVChar( unsigned char * solution, std::string filepath, int h, int w );
 void saveCSVInt( int * solution, std::string filepath, int h, int w );
 double EuclideanDistance(int i1, int j1, int i2, int j2);
+void SaveBitmap( unsigned char * imgData, int w, int h, std::string filePath );
 
 
 #endif /* defined(__unwrapping__Util__) */
