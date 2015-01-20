@@ -146,17 +146,17 @@ void SaveBitmap( unsigned char * imgData, int w, int h, std::string filePath )
         for( unsigned j = 0; j < w; ++j )
         {
             if(imgData[ i*w + j] == BRANCH_CUT)
-                imgSetPixel3f(img, j, i, 0, 255, 0);
+                imgSetPixel3f(img, j, (h-1)-i, 0, 255, 0);
             else if(imgData[ i*w + j] == POS_RESIDUE )
-                imgSetPixel3f(img, j, i, 0, 0, 255);
+                imgSetPixel3f(img, j, (h-1)-i, 0, 0, 255);
             else if( imgData[ i*w + j] == NEG_RESIDUE )
-                imgSetPixel3f(img, j, i, 255, 0, 0);
+                imgSetPixel3f(img, j, (h-1)-i, 255, 0, 0);
             else
-                imgSetPixel3f(img, j, i, 255, 255, 255);
+                imgSetPixel3f(img, j, (h-1)-i, 255, 255, 255);
         }
     }
     
-    std::string path = filePath + "_RESIDUE.bmp";
+    std::string path = filePath + "_BRANCH.bmp";
     imgWriteBMP( (char *)path.c_str(), img);
 
 }
