@@ -14,7 +14,7 @@
 #include "Point.h"
 #include "Edge.h"
 
-void DepthFirstSearch(std::vector<Point *>& points, std::vector<Edge>& edges, Point * start, int groupId, int& nPos, int& nNeg);
-int FindDisconnectedPieces( std::vector<Point *>& points, std::vector<Edge>& edges, bool disconect );
+void DepthFirstSearch(std::vector<Point>& points, std::vector<Edge>& edges, Point * start, int groupId, int& nPos, int& nNeg, bool& borderFound);
+int FindDisconnectedPieces( std::vector<Point>& points, std::vector<Edge>& edges, bool disconect );
 
 #endif /* defined(__PhaseUnwrapping__DepthFirstSearch__) */

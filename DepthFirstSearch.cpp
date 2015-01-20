@@ -9,10 +9,13 @@
 #include "DepthFirstSearch.h"
 #include "Residue.h"
 
-void DepthFirstSearch(std::vector<Point *>& points, std::vector<Edge>& edges, Point * start, int groupId, int& nPos, int& nNeg)
+void DepthFirstSearch(std::vector<Point>& points, std::vector<Edge>& edges, Point * start, int groupId, int& nPos, int& nNeg, bool& borderFound)
 {
     start->group_n = groupId;
     start->visited = true;
+    
+    if(start->isBorder)
+        borderFound = true;
     
     if(start->type == POS_RESIDUE)
         nPos++;
@@ -26,9 +29,9 @@ void DepthFirstSearch(std::vector<Point *>& points, std::vector<Edge>& edges, Po
         
         Point * origin, * destination;
         
-        if( edges[i].p1 == start || edges[i].p2 == start)
+        if( (edges[i].p1->i == start->i && edges[i].p1->j == start->j) || (edges[i].p2->i == start->i && edges[i].p2->j == start->j))
         {
-            if( edges[i].p1 == start)
+            if( (edges[i].p1->i == start->i && edges[i].p1->j == start->j))
             {
                 origin = edges[i].p1;
                 destination = edges[i].p2;
@@ -42,26 +45,27 @@ void DepthFirstSearch(std::vector<Point *>& points, std::vector<Edge>& edges, Po
             if(!destination->visited && !edges[i].visited)
             {
                 edges[i].visited = true;
-                DepthFirstSearch(points, edges, destination, groupId, nPos, nNeg);
+                DepthFirstSearch(points, edges, destination, groupId, nPos, nNeg, borderFound);
             }
         }
     }
 }
 
-int FindDisconnectedPieces( std::vector<Point *>& points, std::vector<Edge>& edges, bool disconect )
+int FindDisconnectedPieces( std::vector<Point>& points, std::vector<Edge>& edges, bool disconect )
 {
     int groups = -1;
     
     for( unsigned int i = 0; i < points.size(); i++ )
     {
-        if( !points[i]->visited )
+        if( !points[i].visited )
         {
             groups++;
+            bool borderFound = false;
             
             int nPos = 0, nNeg = 0;
-            DepthFirstSearch( points, edges, points[i], groups, nPos, nNeg);
+            DepthFirstSearch( points, edges, &points[i], groups, nPos, nNeg, borderFound);
             
-            if(disconect && nPos != nNeg)
+            if(disconect && nPos != nNeg && !borderFound)
                 return -1;
         }
     }
