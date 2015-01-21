@@ -65,7 +65,7 @@ int FindDisconnectedPieces( std::vector<Point>& points, std::vector<Edge>& edges
             int nPos = 0, nNeg = 0;
             DepthFirstSearch( points, edges, &points[i], groups, nPos, nNeg, borderFound);
             
-            if(disconect && nPos != nNeg && !borderFound)
+            if(disconect && nPos != nNeg)
                 return -1;
         }
     }

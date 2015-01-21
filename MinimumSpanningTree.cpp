@@ -50,9 +50,18 @@ double MinimumSpanningTree::ComputeMST( std::vector<Edge>& spanningTreeEdges )
     /* 1. Sorts the edge list */
     std::sort(edges.begin(), edges.end(), sortFunction);
     
+    int nBorder = 0;
+    
     /* 2. Computes the MST  */
     for(unsigned int i = 0; i < edges.size(); i++)
     {
+        if(edges[i].p1->isBorder || edges[i].p2->isBorder)
+            nBorder++;
+     
+        /* Only considers closest border point */
+        if(nBorder > 1)
+            continue;
+        
         int g1, g2;
         g1 = edges[i].p1->group_n;
         g2 = edges[i].p2->group_n;
