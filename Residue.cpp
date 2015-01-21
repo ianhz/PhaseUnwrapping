@@ -65,6 +65,7 @@ int SearchForResidues( float * imageData, unsigned char * bitMap, std::vector<Po
                     Point res;
                     res.i = i;
                     res.j = j;
+                    res.isBorder = false;
                     res.type = POS_RESIDUE;
                     
                     pos_residues.push_back(res);
@@ -78,6 +79,7 @@ int SearchForResidues( float * imageData, unsigned char * bitMap, std::vector<Po
                     Point res;
                     res.i = i;
                     res.j = j;
+                    res.isBorder = false;
                     res.type = NEG_RESIDUE;
                     
                     neg_residues.push_back(res);
