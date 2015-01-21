@@ -8,9 +8,16 @@
 
 #include "LocalSearch.h"
 
-#define OPT_NEIGHBORHOOD 2
+#define OPT_NEIGHBORHOOD 1
 #define MAX_TRIES 10
-#define MAX_DIST 40
+#define MAX_DIST 30
+#define MAX_BORDER_DIST 50
+
+struct Tuple
+{
+    int g1;
+    int g2;
+};
 
 /* Clones the given solution */
 void CloneSolution(std::vector<Group> s, std::vector<Group>& d)
@@ -67,95 +74,86 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
     bool wasImprooved = false;
     srand(time(NULL));
     
-    char ** dontLook = (char **)malloc(k * sizeof(char *));
+    /* Creates and sets the possible combinations array */
+    std::vector<Tuple> combinations;
+    
     for( unsigned int i = 0; i < k; i++ )
-        dontLook[i] = (char *)malloc(k * sizeof(char));
-    int combinations = 0;
+    {
+        for( unsigned int j = 0; j < k; j++ )
+        {
+            if(i == j)
+                continue;
+            
+            Tuple new_t;
+            new_t.g1 = i;
+            new_t.g2 = j;
+            combinations.push_back(new_t);
+        }
+    }
     
     while(!wasImprooved)
     {
-        /* While there was an improovement */
-        for( unsigned int n = 0; n < OPT_NEIGHBORHOOD; n++)
+        /* Selects two random groups from the availiable combinations array*/
+        int tupleInd = rand() % combinations.size();
+        
+        int g1 = combinations[ tupleInd ].g1;
+        int g2 = combinations[ tupleInd ].g2;
+        
+        /* Removes the selected combination from the combinations array */
+        combinations.erase(combinations.begin() + tupleInd);
+        
+        if(neighborSolution[g1].points.size() == 0 || neighborSolution[g2].points.size() == 0)
+            continue;
+        
+        /* Tries to swap points from group g1 to group g2 */
+        for( unsigned int i = 0; i < neighborSolution[g1].points.size(); i++ )
         {
-            /* Selects two random groups */
-            int g1 = rand() % k;
-            int g2 = rand() % k;
-            
-            while( g2 == g1 )
-                g2 = rand() % k;
-            
-            if( dontLook[g1][g2] == 1 || dontLook[g2][g1] == 1)
-                continue;
-            
-            dontLook[g1][g2] = 1;
-            dontLook[g2][g1] = 1;
-            combinations++;
-            
-            if(neighborSolution[g1].points.size() == 0 || neighborSolution[g2].points.size() == 0)
-                continue;
-            
-            /* Tries to swap points from group g1 to group g2 */
-            for( unsigned int i = 0; i < neighborSolution[g1].points.size(); i++ )
+            for( unsigned int j = 0; j < neighborSolution[g2].points.size(); j++ )
             {
-                for( unsigned int j = 0; j < neighborSolution[g2].points.size(); j++ )
+                /* Only swaps ++ or -- residues */
+                if( neighborSolution[g2].points[j].type != neighborSolution[g1].points[i].type )
+                    continue;
+                
+                /* Don't consider points whose distance is greater than MAX_DIST */
+                if( neighborSolution[g1].points[i].isBorder || neighborSolution[g2].points[j].isBorder )
                 {
-                    /* Only swaps ++ or -- residues */
-                    if( neighborSolution[g2].points[j].type != neighborSolution[g1].points[i].type )
-                        continue;
-                    
-                    /* Don't consider points whose distance is greater than MAX_DIST */
-                    if( EuclideanDistance(neighborSolution[g2].points[j].i, neighborSolution[g2].points[j].j, neighborSolution[g1].points[i].i, neighborSolution[g1].points[i].j) > MAX_DIST )
-                        continue;
-                    
-                    Swap( neighborSolution, g1, g2, i, j );
-                    double neighborCost = 0.0;
-                    double n1, n2;
-                    
-                    neighborCost = currentSolutionCost - gC[g1] - gC[g2];
-                    
-                    if( g1 != k-1)
-                    {
-                        _cF->setInstance(neighborSolution[g1].points);
-                        n1 = _cF->ComputeCost();
-                    }
-                    else
-                        n1 = gC[g1];
-                    
-                    if( g2 != k-1)
-                    {
-                        _cF->setInstance(neighborSolution[g2].points);
-                        n2 = _cF->ComputeCost();
-                    }
-                    else
-                        n2 = gC[g2];
-
-                    neighborCost += n1 + n2;
-                    
-                    /* Assigns the better solution else UNDO */
-                    if(neighborCost < currentSolutionCost)
-                    {
-                        Swap( currentSolution, g1, g2, i, j );
-                        wasImprooved = true;
-                        currentSolutionCost = neighborCost;
-                        gC[g1] = n1;
-                        gC[g2] = n2;
-                    }
-                    else
-                    {
-                        Swap( neighborSolution, g1, g2, (int)neighborSolution[g1].points.size()-1, (int)neighborSolution[g2].points.size()-1 );
-                    }
+                    if( EuclideanDistance(neighborSolution[g2].points[j].i, neighborSolution[g2].points[j].j, neighborSolution[g1].points[i].i, neighborSolution[g1].points[i].j) > MAX_BORDER_DIST )
+                            continue;
+                }
+                else if( EuclideanDistance(neighborSolution[g2].points[j].i, neighborSolution[g2].points[j].j, neighborSolution[g1].points[i].i, neighborSolution[g1].points[i].j) > MAX_DIST )
+                    continue;
+                
+                Swap( neighborSolution, g1, g2, i, j );
+                double neighborCost = 0.0;
+                double n1, n2;
+                
+                neighborCost = currentSolutionCost - gC[g1] - gC[g2];
+                
+                _cF->setInstance(neighborSolution[g1].points);
+                n1 = _cF->ComputeCost();
+                
+                _cF->setInstance(neighborSolution[g2].points);
+                n2 = _cF->ComputeCost();
+                neighborCost += n1 + n2;
+                
+                /* Assigns the better solution else UNDO */
+                if(neighborCost < currentSolutionCost)
+                {
+                    Swap( currentSolution, g1, g2, i, j );
+                    wasImprooved = true;
+                    currentSolutionCost = neighborCost;
+                    gC[g1] = n1;
+                    gC[g2] = n2;
+                }
+                else
+                {
+                    Swap( neighborSolution, g1, g2, (int)neighborSolution[g1].points.size()-1, (int)neighborSolution[g2].points.size()-1 );
                 }
             }
         }
         
         /* All combinations already computed */
-        if( combinations == k*k )
+        if( combinations.size() == 0 )
             break;
     }
-    
-    /* Clean up */
-    for( unsigned int i = 0; i < k; i++ )
-        free(dontLook[i]);
-    
-    free(dontLook);
 }
