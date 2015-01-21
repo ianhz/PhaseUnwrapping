@@ -31,6 +31,9 @@ void CloneSolution(std::vector<Group> s, std::vector<Group>& d)
         for( unsigned int p = 0; p < s[g].points.size(); p++ )
             copiedGroup.points.push_back( s[g].points[p] );
         
+        for( unsigned int p = 0; p < s[g].sol_edges.size(); p++ )
+            copiedGroup.sol_edges.push_back( s[g].sol_edges[p] );
+        
         copiedGroup.nPos = s[g].nPos;
         copiedGroup.nNeg = s[g].nNeg;
         copiedGroup.border = s[g].border;
@@ -131,9 +134,9 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
                 
                 _cF->setInstance(neighborSolution[g1].points);
                 n1 = _cF->ComputeCost();
-                
                 _cF->setInstance(neighborSolution[g2].points);
                 n2 = _cF->ComputeCost();
+                
                 neighborCost += n1 + n2;
                 
                 /* Assigns the better solution else UNDO */
