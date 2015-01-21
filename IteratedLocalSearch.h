@@ -32,9 +32,12 @@ public:
 private:
     double * currentGroupCosts;
     double * bestSolutionGroupCosts;
+    double * initialSolutionGroupCosts;
     void GenerateInitialSolution();
     std::vector<Group> bestSolution;
+    std::vector<Group>  initialSolution;
     double bestSolutionCost;
+    double initialSolutionCost;
     CostFunction * _cF;
     int _k;
 };
