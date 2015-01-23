@@ -22,7 +22,7 @@ class LocalSearch
 public:
     void Run(std::vector<Group>& currentSolution, int n, double * groupCosts);
     void setCostFunction(CostFunction * cF);
-    void Swap(std::vector<Group>& neighborSolution, int g1, int g2, int i, int j);
+    void Swap(std::vector<Group>& neighborSolution, int g1, int g2, int i );
     LocalSearch(){};
     ~LocalSearch(){};
 private:

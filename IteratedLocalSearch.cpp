@@ -7,17 +7,20 @@
 //
 
 #include "IteratedLocalSearch.h"
-#define MAX_ITERATIONS 100
-#define SHAKE 1
-#define NUM_POINTS_CHANGE 2
+#define MAX_ITERATIONS 50
+#define SHAKE 5
+#define NUM_POINTS_CHANGE 4
 #define MAX_DIST 10
-#define SHAKE_NUM 5
+#define SHAKE_NUM 10
 
 void IteratedLocalSearch::Shake( std::vector<Group>& solution  )
 {
     LocalSearch ls;
+    int n_shakes = rand() % SHAKE_NUM;
     
-    for( unsigned int i = 0; i < SHAKE_NUM; i++ )
+    printf("Shake operation ---\n");
+    
+    for( unsigned int i = 0; i < n_shakes; i++ )
     {
         /* Selects two random groups */
         int g1 = rand() % _k;
@@ -30,16 +33,15 @@ void IteratedLocalSearch::Shake( std::vector<Group>& solution  )
         {
             /* Select two random points */
             int i1 = rand() % solution[g1].points.size();
-            int i2 = rand() % solution[g2].points.size();
-            
             Point p1 = solution[g1].points[i1];
-            Point p2 = solution[g2].points[i2];
-            
-            if( EuclideanDistance( p1.i, p1.j, p2.i, p2.j) > MAX_DIST || (p1.type != p2.type) )
+            if( p1.isBorder )
+            {
+                j--;
                 continue;
-            
+            }
+        
             /* Swaps */
-            ls.Swap(solution, g1, g2, i1, i2);
+            ls.Swap(solution, g1, g2, i1);
         }
     }
     
@@ -109,38 +111,39 @@ void IteratedLocalSearch::RunMethod()
     }
     
     /* Tries to create balanced sub-groups */
-    for( unsigned int i = 0; i < _k-1; i++ )
+    for( unsigned int i = 0; i < _k; i++ )
     {
         _cF->setInstance(bestSolution[i].points);
         MinimumSpanningTree * mst = (MinimumSpanningTree *)_cF;
         mst->ComputeMST(bestSolution[i].sol_edges);
         
-        for( unsigned int v = 0; v < bestSolution[i].points.size(); v++ )
-        {
-            bestSolution[i].points[v].visited = false;
-        }
-        
-        int borders = 0;
-        
-        for( unsigned int e = 0; e < bestSolution[i].sol_edges.size(); e++ )
-        {
-            Edge * e1 = &bestSolution[i].sol_edges[e];
-            if(e1->p1->isBorder || e1->p2->isBorder)
-                borders++;
-            
-            e1->valid = false;
-            
-            /* After disconnecting the group, if there is a unbalanced subgroups then reconnects the removed edge */
-            if(borders > 1)
-                e1->valid = false;
-            else if(FindDisconnectedPieces(bestSolution[i].points, bestSolution[i].sol_edges, true) == -1)
-                e1->valid = true;
-            
-        }
+//        for( unsigned int v = 0; v < bestSolution[i].points.size(); v++ )
+//        {
+//            bestSolution[i].points[v].visited = false;
+//        }
+//        
+//        int borders = 0;
+//        
+//        for( unsigned int e = 0; e < bestSolution[i].sol_edges.size(); e++ )
+//        {
+//            Edge * e1 = &bestSolution[i].sol_edges[e];
+//            
+//            if(e1->p1->isBorder || e1->p2->isBorder)
+//                borders++;
+//            
+//            e1->valid = false;
+//            
+//            /* After disconnecting the group, if there is a unbalanced subgroup then reconnects the removed edge */
+//            if(borders > 1)
+//                e1->valid = false;
+//            else if(FindDisconnectedPieces(bestSolution[i].points, bestSolution[i].sol_edges, true) == -1)
+//                e1->valid = true;
+//            
+//        }
     }
     
     /* Draws the opt-branches */
-    for( unsigned int i = 0; i < _k-1; i++ )
+    for( unsigned int i = 0; i < _k; i++ )
     {
         for( unsigned int e = 0; e < bestSolution[i].sol_edges.size(); e++ )
         {
@@ -180,7 +183,7 @@ void IteratedLocalSearch::GenerateInitialSolution()
     }
     
     /* Find the number of groups formed */
-    _k = FindDisconnectedPieces(residues, mst_edges, false) + 2;
+    _k = FindDisconnectedPieces(residues, mst_edges, false) + 1;
     
     delete mst;
     mst_edges.clear();
@@ -207,80 +210,9 @@ void IteratedLocalSearch::GenerateInitialSolution()
     std::vector<Point> pos_borders, neg_borders;
     
     /* Creates the closest border vertices for each residue */
-    CreateBorderPoints(_pos_residues, neg_borders, _w, _h);
-    CreateBorderPoints(_neg_residues, pos_borders, _w, _h);
-    
-    /* Creates a group only with borders */
-    for( unsigned int i = 0; i < pos_borders.size(); ++i )
+    for( unsigned int i = 0; i < _k; i++ )
     {
-        initialSolution[_k-1].points.push_back(pos_borders[i]);
-    }
-    for( unsigned int i = 0; i < neg_borders.size(); ++i )
-    {
-        initialSolution[_k-1].points.push_back(neg_borders[i]);
-    }
-    
-    int posBorder = 0, negBorder = 0;
-    
-    /* Assigns the closest border points to balance unbalanced groups */
-    for( unsigned int i = 0; i < _k - 1; ++i )
-    {
-        if( initialSolution[i].nNeg == initialSolution[i].nPos )
-            continue;
-        
-        double minDistance = INFINITY;
-        int border_i = -1;
-        
-        for( unsigned int j = 0; j < initialSolution[i].points.size(); j++ )
-        {
-            for( unsigned int k = 0; k < initialSolution[_k-1].points.size(); k++ )
-            {
-                double currentDist = EuclideanDistance(initialSolution[i].points[j].i, initialSolution[i].points[j].j, initialSolution[_k-1].points[k].i, initialSolution[_k-1].points[k].j);
-                if( currentDist < minDistance )
-                {
-                    minDistance = currentDist;
-                    border_i = k;
-                }
-            }
-        }
-        
-        /* Inserts border point into the unbalanced group and removes it from the borders group */
-        initialSolution[i].points.push_back(initialSolution[_k-1].points[border_i]);
-        initialSolution[_k-1].points.erase(initialSolution[_k-1].points.begin() + border_i);
-    }
-    
-    /* Assigns additional border points to balance nPos/nNeg -- This won't affect the final solution */
-    for( unsigned int i = 0; i < _k - 1; ++i )
-    {
-        if( initialSolution[i].nNeg == initialSolution[i].nPos )
-            continue;
-    
-        while( initialSolution[i].nPos < initialSolution[i].nNeg )
-        {
-            int b = 0;
-            
-            if( initialSolution[_k-1].points[b].type == POS_RESIDUE )
-            {
-                initialSolution[i].points.push_back(initialSolution[_k-1].points[b]);
-                initialSolution[_k-1].points.erase(initialSolution[_k-1].points.begin() + b);
-            }
-            
-            initialSolution[i].nPos++;
-            b++;
-        }
-        while( initialSolution[i].nPos > initialSolution[i].nNeg )
-        {
-            int b = 0;
-            
-            if( initialSolution[_k-1].points[b].type == NEG_RESIDUE )
-            {
-                initialSolution[i].points.push_back(initialSolution[_k-1].points[b]);
-                initialSolution[_k-1].points.erase(initialSolution[_k-1].points.begin() + b);
-            }
-            
-            initialSolution[i].nNeg++;
-            b++;
-        }
+        CreateBorderPoints(initialSolution[i].points, _w, _h);
     }
     
     /*----- The initial solution is generated, with balanced groups ----- */

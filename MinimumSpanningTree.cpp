@@ -28,6 +28,9 @@ void MinimumSpanningTree::CreateEdges()
             if( i == j )
                 continue;
             
+            if( vertices[i]->isBorder && vertices[j]->isBorder )
+                continue;
+            
             Edge e;
             e.p1 = vertices[i];
             e.p2 = vertices[j];
@@ -55,12 +58,18 @@ double MinimumSpanningTree::ComputeMST( std::vector<Edge>& spanningTreeEdges )
     /* 2. Computes the MST  */
     for(unsigned int i = 0; i < edges.size(); i++)
     {
-        if(edges[i].p1->isBorder || edges[i].p2->isBorder)
+        if( edges[i].p1->isBorder || edges[i].p2->isBorder )
+        {
+            /* If the group of vertices is already balanced, don't compute the cost of any residue-to-border edge */
+            if( balanced )
+                continue;
+            
             nBorder++;
-     
-        /* Only considers closest border point */
-        if(nBorder > 1)
-            continue;
+            
+            /* Only considers closest border point */
+            if(nBorder > 1 )
+                continue;
+        }
         
         int g1, g2;
         g1 = edges[i].p1->group_n;
@@ -96,10 +105,21 @@ double MinimumSpanningTree::ComputeCost()
 void MinimumSpanningTree::setInstance(std::vector<Point>& v)
 {
     vertices.clear();
+    int pos = 0, neg = 0;
     
     for( unsigned int i = 0; i < v.size(); i++ )
     {
         vertices.push_back(&v[i]);
         vertices[i]->group_n = i;
+        
+        if( v[i].type == POS_RESIDUE )
+            pos++;
+        else if ( v[i].type == NEG_RESIDUE )
+            neg++;
     }
+    
+    if( pos == neg )
+        balanced = true;
+    else
+        balanced = false;
 }

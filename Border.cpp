@@ -9,9 +9,11 @@
 #include "Border.h"
 
 /* Create border vertices */
-void CreateBorderPoints( std::vector<Point> residues, std::vector<Point>& opp_residues, int w, int h )
+void CreateBorderPoints( std::vector<Point>& residues, int w, int h )
 {
-    for( unsigned int i = 0; i < residues.size(); ++i )
+    unsigned int original_size = (unsigned int)residues.size();
+    
+    for( unsigned int i = 0; i < original_size; ++i )
     {
         int h_distance, v_distance;
         
@@ -48,6 +50,6 @@ void CreateBorderPoints( std::vector<Point> residues, std::vector<Point>& opp_re
         
         border.isBorder = true;
         border.delta = -5;
-        opp_residues.push_back(border);
+        residues.push_back(border);
     }
 }

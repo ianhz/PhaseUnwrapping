@@ -31,6 +31,7 @@ public:
 private:
     void CreateEdges();
     double cost = 0.0;
+    bool balanced = false;
     std::vector<Edge> edges;
     std::vector<Point *> vertices;
 };
