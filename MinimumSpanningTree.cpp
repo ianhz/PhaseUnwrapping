@@ -13,9 +13,9 @@ bool sortFunction( Edge e1, Edge e2 )
     return (e1.cost < e2.cost);
 }
 
-MinimumSpanningTree::MinimumSpanningTree( std::vector<Point>& vertices )
+MinimumSpanningTree::MinimumSpanningTree( std::vector<Point>& vertices,  std::vector<Point>& borders)
 {
-    setInstance(vertices);
+    setInstance(vertices, borders);
 }
 
 void MinimumSpanningTree::CreateEdges()
@@ -38,6 +38,20 @@ void MinimumSpanningTree::CreateEdges()
             edges.push_back(e);
         }
     }
+    
+    if( balanced || borders.empty() )
+        return;
+    
+    /* Complete Graph - n^2 edges */
+    for( unsigned int i = 0; i < vertices.size(); i++ )
+    {
+            Edge e;
+            e.p1 = vertices[i];
+            e.p2 = borders[i];
+            e.cost = EuclideanDistance(e.p1->i, e.p1->j, e.p2->i, e.p2->j);
+            edges.push_back(e);
+    }
+
 }
 
 /* ----- Kruskall's Algorithm for Minimum Spanning Tree ----- */
@@ -54,6 +68,12 @@ double MinimumSpanningTree::ComputeMST( std::vector<Edge>& spanningTreeEdges )
     std::sort(edges.begin(), edges.end(), sortFunction);
     
     int nBorder = 0;
+    int mst_size;
+    
+    if( balanced )
+        mst_size = (int)vertices.size() - 1;
+    else
+        mst_size = (int)vertices.size();
     
     /* 2. Computes the MST  */
     for(unsigned int i = 0; i < edges.size(); i++)
@@ -87,7 +107,7 @@ double MinimumSpanningTree::ComputeMST( std::vector<Edge>& spanningTreeEdges )
             }
         }
         
-        if( spanningTreeEdges.size() == vertices.size() - 1)
+        if( spanningTreeEdges.size() == mst_size )
             break;
     }
 
@@ -102,9 +122,10 @@ double MinimumSpanningTree::ComputeCost()
     return ComputeMST( sTe );
 }
 
-void MinimumSpanningTree::setInstance(std::vector<Point>& v)
+void MinimumSpanningTree::setInstance(std::vector<Point>& v,std::vector<Point>& b)
 {
     vertices.clear();
+    borders.clear();
     int pos = 0, neg = 0;
     
     for( unsigned int i = 0; i < v.size(); i++ )
@@ -116,6 +137,12 @@ void MinimumSpanningTree::setInstance(std::vector<Point>& v)
             pos++;
         else if ( v[i].type == NEG_RESIDUE )
             neg++;
+    }
+    
+    for( unsigned int i = 0; i < b.size(); i++ )
+    {
+        borders.push_back(&b[i]);
+        borders[i]->group_n = (int)v.size() + i;
     }
     
     if( pos == neg )

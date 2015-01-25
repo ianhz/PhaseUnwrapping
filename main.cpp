@@ -14,6 +14,7 @@
 #include "MinimumSpanningTree.h"
 #include "DepthFirstSearch.h"
 #include "IteratedLocalSearch.h"
+#include "Unwrap.h"
 
 int main(int argc, const char * argv[])
 {
@@ -30,6 +31,7 @@ int main(int argc, const char * argv[])
     int h = atoi(argv[2]);
     int w = atoi(argv[3]);
     float * buffer = loadCSV(folderPath + fileName + ".csv", h, w);
+    float * mask = loadCSV(folderPath + fileName + "_mask.csv", h, w);
     
     /* Sets up the instance variables */
     std::vector<Point> pos_residues, neg_residues;
@@ -41,6 +43,11 @@ int main(int argc, const char * argv[])
     method->RunMethod();
     
     SaveBitmap(bitmap, w, h, folderPath+fileName);
+    double * solution = (double *)malloc( h*w*sizeof(double));
+    
+    UnwrapImage(solution, buffer, bitmap, mask, w, h);
+    saveCSV(solution, folderPath+fileName+"_UNWRAPPED.csv", h, w);
+    
     
     
 }

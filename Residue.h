@@ -16,7 +16,9 @@
 #define POS_RESIDUE 10
 #define NEG_RESIDUE 5
 #define BRANCH_CUT 1
+#define ADJOIN 13
 #define FREE_PIXEL 0
+#define UNWRAPPED 20
 #define BALANCED_POS_RESIDUE 50
 #define BALANCED_NEG_RESIDUE 25
 

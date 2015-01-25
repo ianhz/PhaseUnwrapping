@@ -10,8 +10,7 @@
 
 #define OPT_NEIGHBORHOOD 1
 #define MAX_TRIES 10
-#define MAX_DIST 30
-#define MAX_BORDER_DIST 50
+#define MAX_DIST 15
 
 struct Tuple
 {
@@ -30,6 +29,9 @@ void CloneSolution(std::vector<Group> s, std::vector<Group>& d)
         
         for( unsigned int p = 0; p < s[g].points.size(); p++ )
             copiedGroup.points.push_back( s[g].points[p] );
+        
+        for( unsigned int p = 0; p < s[g].border_points.size(); p++ )
+            copiedGroup.border_points.push_back( s[g].border_points[p] );
         
         for( unsigned int p = 0; p < s[g].sol_edges.size(); p++ )
             copiedGroup.sol_edges.push_back( s[g].sol_edges[p] );
@@ -51,7 +53,10 @@ void LocalSearch::setCostFunction(CostFunction * cF)
 void LocalSearch::Swap( std::vector<Group>& current, int g1, int g2, int i )
 {
     Point  p1 = current[g1].points[i];
+    Point  b1 = current[g1].border_points[i];
+    
     current[g2].points.push_back(p1);
+    current[g2].border_points.push_back(b1);
     
     if( p1.type == POS_RESIDUE )
     {
@@ -65,6 +70,7 @@ void LocalSearch::Swap( std::vector<Group>& current, int g1, int g2, int i )
     }
     
     current[g1].points.erase( current[g1].points.begin() + i );
+    current[g1].border_points.erase( current[g1].border_points.begin() + i );
 }
 
 
@@ -103,7 +109,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
     
     int nCombinations = (int)combinations.size();
     
-    while(!wasImprooved)
+    while( !wasImprooved && combinations.size() > 0 )
     {
         /* Selects two random groups from the availiable combinations array*/
         int tupleInd = rand() % combinations.size();
@@ -114,7 +120,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
         /* Removes the selected combination from the combinations array */
         combinations.erase(combinations.begin() + tupleInd);
         
-        if(neighborSolution[g1].points.size() == 0 || neighborSolution[g2].points.size() == 0)
+        if( neighborSolution[g1].points.size() == 0 || neighborSolution[g2].points.size() == 0 )
             continue;
         
         /* Tries to swap points from group g1 to group g2 */
@@ -124,13 +130,30 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
             if( neighborSolution[g1].points[i].isBorder )
                 continue;
             
+            bool maxDist = false;
+            
+            Point * p1 = &neighborSolution[g1].points[i];
+            
+            for( unsigned int j = 0; j < neighborSolution[g2].points.size(); j++ )
+            {
+                Point * p2 = &neighborSolution[g2].points[j];
+                if( EuclideanDistance(p1->i, p1->j, p2->i, p2->j) < MAX_DIST )
+                {
+                    maxDist = true;
+                    break;
+                }
+            }
+            
+            if(!maxDist)
+                continue;
+            
             Swap( neighborSolution, g1, g2, i );
             double neighborCost = currentSolutionCost - gC[g1] - gC[g2];
             double n1, n2;
             
-            _cF->setInstance(neighborSolution[g1].points);
+            _cF->setInstance(neighborSolution[g1].points, neighborSolution[g1].border_points );
             n1 = _cF->ComputeCost();
-            _cF->setInstance(neighborSolution[g2].points);
+            _cF->setInstance(neighborSolution[g2].points, neighborSolution[g2].border_points );
             n2 = _cF->ComputeCost();
             
             neighborCost += n1 + n2;
@@ -139,20 +162,16 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
             if(neighborCost < currentSolutionCost)
             {
                 Swap( currentSolution, g1, g2, i );
-                wasImprooved = true;
+                //wasImprooved = true;
                 currentSolutionCost = neighborCost;
                 gC[g1] = n1;
                 gC[g2] = n2;
+                printf("new best neighbor = %lf\n", currentSolutionCost);
             }
             else
             {
                 Swap( neighborSolution, g2, g1, (int)neighborSolution[g2].points.size()-1 );
             }
-            
         }
-        
-        /* Half of the combinations already computed */
-        if( combinations.size() == nCombinations/2 )
-            break;
     }
 }

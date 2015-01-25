@@ -20,6 +20,7 @@ struct group_info
     int nNeg = 0;
     bool border = false;
     std::vector<Point> points;
+    std::vector<Point> border_points;
     std::vector<Edge> sol_edges;
     
     void setSolEdges( std::vector<Edge> st)

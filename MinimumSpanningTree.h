@@ -21,10 +21,10 @@ bool sortFunction( Edge e1, Edge e2 );
 class MinimumSpanningTree : public CostFunction
 {
 public:
-    MinimumSpanningTree( std::vector<Point>& vertices );
+    MinimumSpanningTree( std::vector<Point>& vertices, std::vector<Point>& borders );
     MinimumSpanningTree() {};
     ~MinimumSpanningTree() {};
-    void setInstance( std::vector<Point>& vertices );
+    void setInstance(std::vector<Point>& v,std::vector<Point>& b);
     double ComputeMST( std::vector<Edge>& spanningTreeEdges );
     double ComputeCost();
     
@@ -34,6 +34,7 @@ private:
     bool balanced = false;
     std::vector<Edge> edges;
     std::vector<Point *> vertices;
+    std::vector<Point *> borders;
 };
 
 #endif /* defined(__PhaseUnwrapping__MinimumSpanningTree__) */

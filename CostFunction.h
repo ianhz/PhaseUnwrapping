@@ -16,7 +16,7 @@ class CostFunction
 {
 public:
     virtual double ComputeCost() = 0;
-    virtual void setInstance( std::vector<Point>& solution ) = 0;
+    virtual void setInstance( std::vector<Point>& solution, std::vector<Point>& borders ) = 0;
 };
 
 #endif

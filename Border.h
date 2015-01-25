@@ -14,6 +14,6 @@
 #include "Point.h"
 
 /* Create border vertices */
-void CreateBorderPoints( std::vector<Point>& residues, int w, int h );
-
+void CreateBorderPoints( std::vector<Point> residues, std::vector<Point>& border, int w, int h );
+void CreateClosestBorderPoint( std::vector<Point>& residues, int w, int h );
 #endif /* defined(__PhaseUnwrapping__Border__) */
