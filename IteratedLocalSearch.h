@@ -30,9 +30,6 @@ public:
     IteratedLocalSearch() {};
     ~IteratedLocalSearch() {};
 private:
-    double * currentGroupCosts;
-    double * bestSolutionGroupCosts;
-    double * initialSolutionGroupCosts;
     void GenerateInitialSolution();
     std::vector<Group> bestSolution;
     std::vector<Group>  initialSolution;

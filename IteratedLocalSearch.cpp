@@ -7,10 +7,9 @@
 //
 
 #include "IteratedLocalSearch.h"
-#define MAX_ITERATIONS 50
+#define MAX_ITERATIONS 150
 #define SHAKE 5
 #define NUM_POINTS_CHANGE 4
-#define MAX_DIST 10
 #define SHAKE_NUM 10
 
 void IteratedLocalSearch::Shake( std::vector<Group>& solution  )
@@ -53,7 +52,6 @@ void IteratedLocalSearch::Shake( std::vector<Group>& solution  )
     
 //    - ALTERNATIVE OPTION -
     CloneSolution(initialSolution, solution);
-    memcpy( currentGroupCosts, initialSolutionGroupCosts, _k * sizeof(double *));
 }
 
 void IteratedLocalSearch::RunMethod()
@@ -71,21 +69,18 @@ void IteratedLocalSearch::RunMethod()
     _cF = new MinimumSpanningTree();
     lSearch->setCostFunction(_cF);
     
-    currentGroupCosts = (double *)malloc( _k * sizeof(double));
-    memcpy(currentGroupCosts, bestSolutionGroupCosts, _k*sizeof(double));
-    
     srand(time(NULL));
     
     printf("Initial best solution = %lf\n", bestSolutionCost);
     
     for( unsigned int i = 0; i < MAX_ITERATIONS; i++ )
     {
-        lSearch->Run(currentBestSolution, _k, currentGroupCosts);
+        lSearch->Run(currentBestSolution, _k);
         
         double currentBestSolutionCost = 0;
         
         for( unsigned int i = 0; i < _k; i++ )
-            currentBestSolutionCost += currentGroupCosts[i];
+            currentBestSolutionCost += currentBestSolution[i].cost;
         
         if( currentBestSolutionCost < bestSolutionCost )
         {
@@ -93,8 +88,6 @@ void IteratedLocalSearch::RunMethod()
             
             /* Copies the current solution */
             CloneSolution(currentBestSolution, bestSolution);
-            
-            memcpy(bestSolutionGroupCosts, currentGroupCosts, _k*sizeof(double));
             bestSolutionCost = currentBestSolutionCost;
         }
         else
@@ -106,7 +99,7 @@ void IteratedLocalSearch::RunMethod()
             Shake(currentBestSolution);
             notimprovedIterations = 0;
             for( unsigned int i = 0; i < _k; i++ )
-                currentBestSolutionCost += currentGroupCosts[i];
+                currentBestSolutionCost += currentBestSolution[i].cost;
         }
     }
     
@@ -219,21 +212,18 @@ void IteratedLocalSearch::GenerateInitialSolution()
     }
     
     /*----- The initial solution is generated, with balanced groups ----- */
-    initialSolutionGroupCosts = (double *)malloc( _k * sizeof(double));
-    bestSolutionGroupCosts = (double *)malloc( _k * sizeof(double));
     _cF = new MinimumSpanningTree();
     
     for( unsigned int i = 0; i < _k; i++ )
     {
         MinimumSpanningTree * mst = (MinimumSpanningTree *)_cF;
         mst->setInstance(initialSolution[i].points, initialSolution[i].border_points);
-        initialSolutionGroupCosts[i] = mst->ComputeMST(initialSolution[i].sol_edges);
-        initialSolutionCost += initialSolutionGroupCosts[i];
+        initialSolution[i].cost = mst->ComputeMST(initialSolution[i].sol_edges);
+        initialSolutionCost += initialSolution[i].cost;
     }
     
-    bestSolutionCost = initialSolutionCost;
     CloneSolution(initialSolution, bestSolution);
-    memcpy( bestSolutionGroupCosts, initialSolutionGroupCosts, _k*sizeof(double) );
+    bestSolutionCost = initialSolutionCost;
     
     MinimumSpanningTree * mst_cf = (MinimumSpanningTree *)_cF;
     delete mst_cf;

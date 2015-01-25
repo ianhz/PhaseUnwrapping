@@ -10,7 +10,6 @@
 
 #define OPT_NEIGHBORHOOD 1
 #define MAX_TRIES 10
-#define MAX_DIST 15
 
 struct Tuple
 {
@@ -40,6 +39,7 @@ void CloneSolution(std::vector<Group> s, std::vector<Group>& d)
         copiedGroup.nNeg = s[g].nNeg;
         copiedGroup.border = s[g].border;
         copiedGroup.groupId = g;
+        copiedGroup.cost = s[g].cost;
         
         d.push_back(copiedGroup);
     }
@@ -50,42 +50,20 @@ void LocalSearch::setCostFunction(CostFunction * cF)
     _cF = cF;
 }
 
-void LocalSearch::Swap( std::vector<Group>& current, int g1, int g2, int i )
-{
-    Point  p1 = current[g1].points[i];
-    Point  b1 = current[g1].border_points[i];
-    
-    current[g2].points.push_back(p1);
-    current[g2].border_points.push_back(b1);
-    
-    if( p1.type == POS_RESIDUE )
-    {
-        current[g1].nPos--;
-        current[g2].nPos++;
-    }
-    else
-    {
-        current[g1].nNeg--;
-        current[g2].nNeg++;
-    }
-    
-    current[g1].points.erase( current[g1].points.begin() + i );
-    current[g1].border_points.erase( current[g1].border_points.begin() + i );
-}
 
-
-void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
+void LocalSearch::Run( std::vector<Group>& currentSolution, int k)
 {
     double currentSolutionCost = 0.0;
     
     for( unsigned int i = 0; i < k; i++ )
     {
-        currentSolutionCost += gC[i];
+        currentSolutionCost += currentSolution[i].cost;
     }
     
     /* Clones the current solution */
-    std::vector<Group> neighborSolution;
-    CloneSolution(currentSolution, neighborSolution);
+    std::vector<Group> neighborSolution1, neighborSolution2;
+    CloneSolution(currentSolution, neighborSolution1);
+    CloneSolution(currentSolution, neighborSolution2);
     
     bool wasImprooved = false;
     srand(time(NULL));
@@ -107,8 +85,6 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
         }
     }
     
-    int nCombinations = (int)combinations.size();
-    
     while( !wasImprooved && combinations.size() > 0 )
     {
         /* Selects two random groups from the availiable combinations array*/
@@ -120,58 +96,28 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, double * gC )
         /* Removes the selected combination from the combinations array */
         combinations.erase(combinations.begin() + tupleInd);
         
-        if( neighborSolution[g1].points.size() == 0 || neighborSolution[g2].points.size() == 0 )
-            continue;
-        
         /* Tries to swap points from group g1 to group g2 */
-        for( unsigned int i = 0; i < neighborSolution[g1].points.size(); i++ )
+        double n1 = Relocate(neighborSolution1, g1, g2, currentSolutionCost);
+        double n2 = Swap(neighborSolution2, g1, g2, currentSolutionCost);
+        
+        if( n1 <= n2 )
         {
-            /* Doesn't pass border points */
-            if( neighborSolution[g1].points[i].isBorder )
-                continue;
-            
-            bool maxDist = false;
-            
-            Point * p1 = &neighborSolution[g1].points[i];
-            
-            for( unsigned int j = 0; j < neighborSolution[g2].points.size(); j++ )
+            if(n1 < currentSolutionCost)
             {
-                Point * p2 = &neighborSolution[g2].points[j];
-                if( EuclideanDistance(p1->i, p1->j, p2->i, p2->j) < MAX_DIST )
-                {
-                    maxDist = true;
-                    break;
-                }
+                CloneSolution(neighborSolution1, currentSolution);
+                currentSolutionCost = n1;
             }
-            
-            if(!maxDist)
-                continue;
-            
-            Swap( neighborSolution, g1, g2, i );
-            double neighborCost = currentSolutionCost - gC[g1] - gC[g2];
-            double n1, n2;
-            
-            _cF->setInstance(neighborSolution[g1].points, neighborSolution[g1].border_points );
-            n1 = _cF->ComputeCost();
-            _cF->setInstance(neighborSolution[g2].points, neighborSolution[g2].border_points );
-            n2 = _cF->ComputeCost();
-            
-            neighborCost += n1 + n2;
-            
-            /* Assigns the better solution else UNDO */
-            if(neighborCost < currentSolutionCost)
+        }
+        else
+        {
+            if(n2 < currentSolutionCost)
             {
-                Swap( currentSolution, g1, g2, i );
-                //wasImprooved = true;
-                currentSolutionCost = neighborCost;
-                gC[g1] = n1;
-                gC[g2] = n2;
-                printf("new best neighbor = %lf\n", currentSolutionCost);
-            }
-            else
-            {
-                Swap( neighborSolution, g2, g1, (int)neighborSolution[g2].points.size()-1 );
+                CloneSolution(neighborSolution2, currentSolution);
+                currentSolutionCost = n2;
             }
         }
     }
+    
+    neighborSolution1.clear();
+    neighborSolution2.clear();
 }

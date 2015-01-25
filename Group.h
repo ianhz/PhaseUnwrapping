@@ -19,6 +19,7 @@ struct group_info
     int nPos = 0;
     int nNeg = 0;
     bool border = false;
+    double cost = 0;
     std::vector<Point> points;
     std::vector<Point> border_points;
     std::vector<Edge> sol_edges;
