@@ -82,11 +82,15 @@ double Relocate( std::vector<Group>& currentSolution, int g1, int g2, double cur
             newCurrentCost = neighborCost;
             currentSolution[g1].cost = n1;
             currentSolution[g2].cost = n2;
+            neighbor[g1].cost = n1;
+            neighbor[g2].cost = n2;
             printf("new best Relocate-Neighbor = %lf\n", neighborCost);
         }
         else
         {
             RSwap( neighbor, g2, g1, (int)neighbor[g2].points.size()-1 );
+            neighbor[g1].cost = currentSolution[g1].cost;
+            neighbor[g2].cost = currentSolution[g2].cost;
         }
     }
     

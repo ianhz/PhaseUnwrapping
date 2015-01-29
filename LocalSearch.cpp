@@ -105,6 +105,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k)
             if(n1 < currentSolutionCost)
             {
                 CloneSolution(neighborSolution1, currentSolution);
+                CloneSolution(currentSolution, neighborSolution2);
                 currentSolutionCost = n1;
             }
         }
@@ -113,6 +114,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k)
             if(n2 < currentSolutionCost)
             {
                 CloneSolution(neighborSolution2, currentSolution);
+                CloneSolution(currentSolution, neighborSolution1);
                 currentSolutionCost = n2;
             }
         }

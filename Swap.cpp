@@ -72,11 +72,15 @@ double Swap( std::vector<Group>& currentSolution, int g1, int g2, double current
                 newCurrentCost = neighborCost;
                 currentSolution[g1].cost = n1;
                 currentSolution[g2].cost = n2;
+                neighbor[g1].cost = n1;
+                neighbor[g2].cost = n2;
                 printf("new best Swap-Neighbor = %lf\n", neighborCost);
             }
             else
             {
                 SSwap( neighbor, g2, g1, (int)neighbor[g2].points.size()-1, (int)neighbor[g1].points.size()-1 );
+                neighbor[g1].cost = currentSolution[g1].cost;
+                neighbor[g2].cost = currentSolution[g2].cost;
             }
         }
     }

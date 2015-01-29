@@ -7,8 +7,8 @@
 //
 
 #include "IteratedLocalSearch.h"
-#define MAX_ITERATIONS 150
-#define SHAKE 5
+#define MAX_ITERATIONS 300
+#define SHAKE 10
 #define NUM_POINTS_CHANGE 4
 #define SHAKE_NUM 10
 
@@ -111,30 +111,6 @@ void IteratedLocalSearch::RunMethod()
         _cF->setInstance( bestSolution[i].points, bestSolution[i].border_points );
         MinimumSpanningTree * mst = (MinimumSpanningTree *)_cF;
         mst->ComputeMST(bestSolution[i].sol_edges);
-        
-//        for( unsigned int v = 0; v < bestSolution[i].points.size(); v++ )
-//        {
-//            bestSolution[i].points[v].visited = false;
-//        }
-//        
-//        int borders = 0;
-//        
-//        for( unsigned int e = 0; e < bestSolution[i].sol_edges.size(); e++ )
-//        {
-//            Edge * e1 = &bestSolution[i].sol_edges[e];
-//            
-//            if(e1->p1->isBorder || e1->p2->isBorder)
-//                borders++;
-//            
-//            e1->valid = false;
-//            
-//            /* After disconnecting the group, if there is a unbalanced subgroup then reconnects the removed edge */
-//            if(borders > 1)
-//                e1->valid = false;
-//            else if(FindDisconnectedPieces(bestSolution[i].points, bestSolution[i].sol_edges, true) == -1)
-//                e1->valid = true;
-//            
-//        }
     }
     
     /* Draws the opt-branches */
