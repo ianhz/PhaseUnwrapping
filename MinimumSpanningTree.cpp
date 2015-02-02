@@ -106,7 +106,6 @@ double MinimumSpanningTree::ComputeMST( std::vector<Edge>& spanningTreeEdges )
                     vertices[j]->group_n = g2;
             }
         }
-        
         if( spanningTreeEdges.size() == mst_size )
             break;
     }

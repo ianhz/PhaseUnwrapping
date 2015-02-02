@@ -16,6 +16,8 @@
 #include "Util.h"
 #include "Relocate.h"
 #include "Swap.h"
+#include "Break1Insert1.h"
+#include "C_Relocate.h"
 
 void CloneSolution(std::vector<Group> source, std::vector<Group>& destination);
 void Swap(std::vector<Group>& neighborSolution, int g1, int g2, int i );
@@ -23,7 +25,7 @@ void Swap(std::vector<Group>& neighborSolution, int g1, int g2, int i );
 class LocalSearch
 {
 public:
-    void Run(std::vector<Group>& currentSolution, int n);
+    void Run(std::vector<Group>& currentSolution, int n, int w, int h );
     void setCostFunction(CostFunction * cF);
     LocalSearch(){};
     ~LocalSearch(){};

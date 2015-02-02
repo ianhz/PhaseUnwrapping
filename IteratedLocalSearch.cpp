@@ -7,8 +7,8 @@
 //
 
 #include "IteratedLocalSearch.h"
-#define MAX_ITERATIONS 300
-#define SHAKE 10
+#define MAX_ITERATIONS 100
+#define SHAKE 2
 #define NUM_POINTS_CHANGE 4
 #define SHAKE_NUM 10
 
@@ -75,7 +75,7 @@ void IteratedLocalSearch::RunMethod()
     
     for( unsigned int i = 0; i < MAX_ITERATIONS; i++ )
     {
-        lSearch->Run(currentBestSolution, _k);
+        lSearch->Run(currentBestSolution, _k, _w, _h);
         
         double currentBestSolutionCost = 0;
         

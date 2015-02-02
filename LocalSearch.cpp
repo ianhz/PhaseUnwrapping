@@ -51,7 +51,7 @@ void LocalSearch::setCostFunction(CostFunction * cF)
 }
 
 
-void LocalSearch::Run( std::vector<Group>& currentSolution, int k)
+void LocalSearch::Run( std::vector<Group>& currentSolution, int k, int w, int h)
 {
     double currentSolutionCost = 0.0;
     
@@ -61,9 +61,11 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k)
     }
     
     /* Clones the current solution */
-    std::vector<Group> neighborSolution1, neighborSolution2;
+    std::vector<Group> neighborSolution1, neighborSolution2, neighborSolution3, neighborSolution4;
     CloneSolution(currentSolution, neighborSolution1);
     CloneSolution(currentSolution, neighborSolution2);
+    CloneSolution(currentSolution, neighborSolution3);
+    CloneSolution(currentSolution, neighborSolution4);
     
     bool wasImprooved = false;
     srand(time(NULL));
@@ -99,27 +101,58 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k)
         /* Tries to swap points from group g1 to group g2 */
         double n1 = Relocate(neighborSolution1, g1, g2, currentSolutionCost);
         double n2 = Swap(neighborSolution2, g1, g2, currentSolutionCost);
+        double n3 = Break1Insert1(neighborSolution3, g1, g2, currentSolutionCost, w, h);
+        double n4 = C_Relocate(neighborSolution4, g1, g2, currentSolutionCost);
         
-        if( n1 <= n2 )
+        if( n1 <= n2 && n1 <= n3 && n1 <= n4)
         {
             if(n1 < currentSolutionCost)
             {
                 CloneSolution(neighborSolution1, currentSolution);
                 CloneSolution(currentSolution, neighborSolution2);
+                CloneSolution(currentSolution, neighborSolution3);
+                CloneSolution(currentSolution, neighborSolution4);
                 currentSolutionCost = n1;
             }
         }
-        else
+        else if( n2 <= n1 && n2 <= n3 && n2 <= n4 )
         {
             if(n2 < currentSolutionCost)
             {
                 CloneSolution(neighborSolution2, currentSolution);
                 CloneSolution(currentSolution, neighborSolution1);
+                CloneSolution(currentSolution, neighborSolution3);
+                CloneSolution(currentSolution, neighborSolution4);
                 currentSolutionCost = n2;
             }
         }
+        else if( n3<= n1 && n3 <= n2 && n3 <= n4 )
+        {
+            if( n3 < currentSolutionCost )
+            {
+                CloneSolution(neighborSolution3, currentSolution);
+                CloneSolution(currentSolution, neighborSolution1);
+                CloneSolution(currentSolution, neighborSolution2);
+                CloneSolution(currentSolution, neighborSolution4);
+                currentSolutionCost = n3;
+            }
+        }
+        else if( n4 <= n1 && n4 <= n2 && n4 <= n3 )
+        {
+            if( n4 < currentSolutionCost )
+            {
+                CloneSolution(neighborSolution4, currentSolution);
+                CloneSolution(currentSolution, neighborSolution1);
+                CloneSolution(currentSolution, neighborSolution2);
+                CloneSolution(currentSolution, neighborSolution3);
+                currentSolutionCost = n4;
+            }
+        }
+        
     }
     
     neighborSolution1.clear();
     neighborSolution2.clear();
+    neighborSolution3.clear();
+    neighborSolution4.clear();
 }
