@@ -14,43 +14,7 @@
 
 void IteratedLocalSearch::Shake( std::vector<Group>& solution  )
 {
-//    LocalSearch ls;
-//    int n_shakes = rand() % SHAKE_NUM;
-//    
     printf("Shake operation ---\n");
-//    
-//    for( unsigned int i = 0; i < n_shakes; i++ )
-//    {
-//        /* Selects two random groups */
-//        int g1 = rand() % _k;
-//        int g2 = rand() % _k;
-//        
-//        while( g2 == g1 )
-//            g2 = rand() % _k;
-//        
-//        for( unsigned int j = 0; j < NUM_POINTS_CHANGE; j++ )
-//        {
-//            if(solution[g1].points.empty())
-//                break;
-//            
-//            /* Select two random points */
-//            int i1 = rand() % solution[g1].points.size();
-//            Point * p1 = &solution[g1].points[i1];
-//            if( p1->isBorder )
-//                continue;
-//        
-//            /* Swaps */
-//            ls.Swap(solution, g1, g2, i1);
-//        }
-//    }
-//    
-//    for( unsigned int i = 0; i < _k; i++ )
-//    {
-//        _cF->setInstance(solution[i].points, solution[i].border_points);
-//        currentGroupCosts[i] = _cF->ComputeCost();
-//    }
-    
-//    - ALTERNATIVE OPTION -
     CloneSolution(initialSolution, solution);
 }
 

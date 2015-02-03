@@ -8,6 +8,40 @@
 
 #include "Border.h"
 
+void FindClosestBorderPoint( int i, int j, int w, int h, int& bi, int& bj )
+{
+    int h_distance, v_distance;
+    
+    if( i < (h-1) - i )
+        v_distance = i;
+    else
+        v_distance = (h-1) - i;
+    
+    if( j < (w-1) - j )
+        h_distance = j;
+    else
+        h_distance = (w-1) - j;
+    
+    if( h_distance < v_distance )
+    {
+        bi = i;
+        
+        if( h_distance == j )
+            bj = 0;
+        else
+            bj = w-1;
+    }
+    else
+    {
+        bj = j;
+        
+        if( v_distance == i )
+            bi = 0;
+        else
+            bi = h-1;
+    }
+}
+
 /* Create border vertices */
 void CreateBorderPoints( std::vector<Point> residues, std::vector<Point>& borders, int w, int h )
 {

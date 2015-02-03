@@ -24,12 +24,11 @@ class IteratedLocalSearch : public Heuristic
 {
 public:
     void RunMethod();
-    void InitProcedures();
     void setCostFunction( CostFunction c );
-    void Shake( std::vector<Group>& solution );
     IteratedLocalSearch() {};
     ~IteratedLocalSearch() {};
 private:
+    void Shake( std::vector<Group>& solution );
     void GenerateInitialSolution();
     std::vector<Group> bestSolution;
     std::vector<Group>  initialSolution;

@@ -15,6 +15,7 @@
 #include "DepthFirstSearch.h"
 #include "IteratedLocalSearch.h"
 #include "Unwrap.h"
+#include "Goldstein.h"
 
 int main(int argc, const char * argv[])
 {
@@ -47,7 +48,7 @@ int main(int argc, const char * argv[])
     unsigned char * bitmap = (unsigned char *)malloc( h * w * sizeof(char));
     SearchForResidues(buffer, bitmap, pos_residues, neg_residues, w, h);
     
-    Heuristic * method = new IteratedLocalSearch();
+    Heuristic * method = new Goldstein();//new IteratedLocalSearch();
     method->SetInputs(bitmap, pos_residues, neg_residues, w, h);
     method->RunMethod();
     
