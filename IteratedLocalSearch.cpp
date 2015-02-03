@@ -8,7 +8,7 @@
 
 #include "IteratedLocalSearch.h"
 #define MAX_ITERATIONS 100
-#define SHAKE 2
+#define SHAKE 20
 #define NUM_POINTS_CHANGE 4
 #define SHAKE_NUM 10
 

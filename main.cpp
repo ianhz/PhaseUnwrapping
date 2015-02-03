@@ -33,6 +33,15 @@ int main(int argc, const char * argv[])
     float * buffer = loadCSV(folderPath + fileName + ".csv", h, w);
     float * mask = loadCSV(folderPath + fileName + "_mask.csv", h, w);
     
+    if(!mask)
+    {
+        mask = (float *)malloc(h*w*sizeof(float));
+        for(int i = 0; i < h; i++)
+            for(int j = 0; j < w; j++)
+                mask[i*w + j] = 255;
+    }
+    
+    
     /* Sets up the instance variables */
     std::vector<Point> pos_residues, neg_residues;
     unsigned char * bitmap = (unsigned char *)malloc( h * w * sizeof(char));

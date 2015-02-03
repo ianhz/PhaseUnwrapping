@@ -102,7 +102,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, int w, int h)
         double n1 = Relocate(neighborSolution1, g1, g2, currentSolutionCost);
         double n2 = Swap(neighborSolution2, g1, g2, currentSolutionCost);
         double n3 = Break1Insert1(neighborSolution3, g1, g2, currentSolutionCost, w, h);
-        double n4 = C_Relocate(neighborSolution4, g1, g2, currentSolutionCost);
+        double n4 = INFINITY; //C_Relocate(neighborSolution4, g1, g2, currentSolutionCost);
         
         if( n1 <= n2 && n1 <= n3 && n1 <= n4)
         {

@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include "Point.h"
-#define MAX_EDGE_COST 8
+#define MAX_EDGE_COST 4
 
 struct mst_node
 {
