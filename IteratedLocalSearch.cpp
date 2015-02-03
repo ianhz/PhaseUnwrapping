@@ -113,6 +113,32 @@ void IteratedLocalSearch::RunMethod()
         mst->ComputeMST(bestSolution[i].sol_edges);
     }
     
+    for(unsigned int i = 0; i < _k; i++)
+    {
+        for(unsigned int k = 0; k < bestSolution[i].points.size(); k++)
+            bestSolution[i].points[k].visited = false;
+        
+        for(unsigned int k = 0; k < bestSolution[i].sol_edges.size(); k++)
+            bestSolution[i].sol_edges[k].visited = false;
+        
+        for( unsigned int j = 0; j < bestSolution[i].sol_edges.size(); j++ )
+        {
+            bestSolution[i].sol_edges[j].valid = false;
+            
+            int result = FindDisconnectedPieces(bestSolution[i].points, bestSolution[i].sol_edges, true);
+            
+            for(unsigned int k = 0; k < bestSolution[i].points.size(); k++)
+                bestSolution[i].points[k].visited = false;
+            
+            for(unsigned int k = 0; k < bestSolution[i].sol_edges.size(); k++)
+                bestSolution[i].sol_edges[k].visited = false;
+            
+            if( result == -1 )
+                bestSolution[i].sol_edges[j].valid = true;
+        }
+    }
+
+    
     /* Draws the opt-branches */
     for( unsigned int i = 0; i < _k; i++ )
     {

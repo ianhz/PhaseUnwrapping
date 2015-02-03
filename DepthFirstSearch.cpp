@@ -16,10 +16,9 @@ void DepthFirstSearch(std::vector<Point>& points, std::vector<Edge>& edges, Poin
     
     if(start->isBorder)
         borderFound = true;
-    
-    if(start->type == POS_RESIDUE)
+    else if(start->type == POS_RESIDUE)
         nPos++;
-    else
+    else if(start->type == NEG_RESIDUE)
         nNeg++;
     
     for( unsigned int i = 0; i < edges.size(); i++ )
@@ -65,7 +64,7 @@ int FindDisconnectedPieces( std::vector<Point>& points, std::vector<Edge>& edges
             int nPos = 0, nNeg = 0;
             DepthFirstSearch( points, edges, &points[i], groups, nPos, nNeg, borderFound);
             
-            if(disconect && nPos != nNeg)
+            if(disconect && nPos != nNeg && !borderFound)
                 return -1;
         }
     }
