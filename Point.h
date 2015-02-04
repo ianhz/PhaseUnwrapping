@@ -20,6 +20,7 @@ struct Point
     bool visited = false;
     int group_n = -1;
     bool stolen = false;
+    bool connected = false;
     int lastStolenFrom;
     double delta;
 };

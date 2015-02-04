@@ -16,12 +16,13 @@
 #include "Residue.h"
 #include "Border.h"
 
-#define MASK_SIZE 3
+#define MAX_MASK_SIZE 32
 
 class Goldstein : public Heuristic
 {
 public:
     void RunMethod();
+    void RunMethod_2();
     void setCostFunction( CostFunction c );
     Goldstein() {};
     ~Goldstein() {};
