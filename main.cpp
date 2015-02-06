@@ -71,9 +71,9 @@ int main(int argc, const char * argv[])
     method->SetInputs(bitmap, pos_residues, neg_residues, w, h);
     method->RunMethod();
     
-    SaveBitmap(bitmap, w, h, folderPath+fileName);
+    SaveBitmap(bitmap, w, h, folderPath+fileName+argv[4]);
     double * solution = (double *)malloc( h*w*sizeof(double));
     
     UnwrapImage(solution, buffer, bitmap, mask, w, h);
-    saveCSV(solution, folderPath+fileName+"_UNWRAPPED.csv", h, w);
+    saveCSV(solution, folderPath+fileName+argv[4]+"_UNWRAPPED.csv", h, w);
 }
