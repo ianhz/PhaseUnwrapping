@@ -19,11 +19,13 @@
 
 int main(int argc, const char * argv[])
 {
-    if(argc < 3)
+    if(argc < 5)
     {
         printf("Too few arguments...Exiting!\n\n");
         return 0;
     }
+    
+    Heuristic * method;
     
     std::string folderPath = "/Users/ianhz/Documents/PUC/Mestrado/Dissertacao/Resultados/Actual/";
     const char * fileName = argv[1];
@@ -31,6 +33,18 @@ int main(int argc, const char * argv[])
     
     int h = atoi(argv[2]);
     int w = atoi(argv[3]);
+
+    
+    if( !strcmp(argv[4], "-ils") )
+        method = new IteratedLocalSearch();
+    else if( !strcmp(argv[4], "-goldstein") )
+        method = new Goldstein();
+    else
+    {
+        printf("Invalid method...Exiting!\n\n)");
+        return 0;
+    }
+    
     float * buffer = loadCSV(folderPath + fileName + ".csv", h, w);
     float * mask = loadCSV(folderPath + fileName + "_mask.csv", h, w);
     
@@ -42,13 +56,12 @@ int main(int argc, const char * argv[])
                 mask[i*w + j] = 255;
     }
     
-    
     /* Sets up the instance variables */
     std::vector<Point> pos_residues, neg_residues;
-    unsigned char * bitmap = (unsigned char *)malloc( h * w * sizeof(char));
+    unsigned char * bitmap = (unsigned char *)malloc( h * w * sizeof(unsigned char));
     SearchForResidues(buffer, bitmap, pos_residues, neg_residues, w, h);
     
-    Heuristic * method = new Goldstein();//new IteratedLocalSearch();
+
     method->SetInputs(bitmap, pos_residues, neg_residues, w, h);
     method->RunMethod();
     
@@ -57,7 +70,4 @@ int main(int argc, const char * argv[])
     
     UnwrapImage(solution, buffer, bitmap, mask, w, h);
     saveCSV(solution, folderPath+fileName+"_UNWRAPPED.csv", h, w);
-    
-    
-    
 }

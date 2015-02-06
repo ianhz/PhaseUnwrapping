@@ -19,7 +19,6 @@ double Break1Insert1( std::vector<Group>& currentSolution, int g1, int g2, doubl
     
     std::vector<Group> neighbor;
     CloneSolution(currentSolution, neighbor);
-    CostFunction * _cF = new MinimumSpanningTree();
     
     double minDistance = INFINITY;
     
@@ -55,7 +54,7 @@ double Break1Insert1( std::vector<Group>& currentSolution, int g1, int g2, doubl
     }
     
     /* Computes the new spanning tree and removes the longer edge */
-    MinimumSpanningTree * mst = (MinimumSpanningTree *)_cF;
+    MinimumSpanningTree * mst = new MinimumSpanningTree();
     mst->setInstance(testGroup.points, testGroup.border_points);
     mst->ComputeMST(testGroup.sol_edges);
     
@@ -64,7 +63,7 @@ double Break1Insert1( std::vector<Group>& currentSolution, int g1, int g2, doubl
     
     for( int i = 0; i < testGroup.sol_edges.size(); i++ )
     {
-        if( testGroup.sol_edges[i].cost < maxDistance )
+        if( testGroup.sol_edges[i].cost > maxDistance )
         {
             maxDistance = testGroup.sol_edges[i].cost;
             edge_index = i;
@@ -75,10 +74,14 @@ double Break1Insert1( std::vector<Group>& currentSolution, int g1, int g2, doubl
     FindDisconnectedPieces(testGroup.points, testGroup.sol_edges, false);
     
     neighbor[g1].points.clear();
+    neighbor[g1].border_points.clear();
+    neighbor[g1].sol_edges.clear();
     neighbor[g1].nPos = 0;
     neighbor[g1].nNeg = 0;
     
     neighbor[g2].points.clear();
+    neighbor[g2].border_points.clear();
+    neighbor[g2].sol_edges.clear();
     neighbor[g2].nPos = 0;
     neighbor[g2].nNeg = 0;
     
@@ -124,7 +127,7 @@ double Break1Insert1( std::vector<Group>& currentSolution, int g1, int g2, doubl
     if( neighborCost < currentCost )
     {
         newCurrentCost = neighborCost;
-        CloneSolution(neighbor, currentSolution);
+        ClonePartialSolution(neighbor, currentSolution, g1, g2);
         printf("new best Break1_Insert1-Neighbor = %lf\n", neighborCost);
     }
     

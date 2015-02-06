@@ -20,6 +20,7 @@
 #include "C_Relocate.h"
 
 void CloneSolution(std::vector<Group> source, std::vector<Group>& destination);
+void ClonePartialSolution(std::vector<Group> s, std::vector<Group>& d, int g1, int g2);
 void Swap(std::vector<Group>& neighborSolution, int g1, int g2, int i );
 
 class LocalSearch

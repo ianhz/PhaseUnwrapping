@@ -45,6 +45,51 @@ void CloneSolution(std::vector<Group> s, std::vector<Group>& d)
     }
 }
 
+/* Clones the given g1 and g2 solution */
+void ClonePartialSolution(std::vector<Group> s, std::vector<Group>& d, int g1, int g2)
+{
+    /* Resets groups g1 and g2 */
+    d[g1].points.clear();
+    d[g1].border_points.clear();
+    d[g1].sol_edges.clear();
+    d[g1].nPos = 0;
+    d[g1].nNeg = 0;
+    d[g1].cost = 0;
+    
+    d[g2].points.clear();
+    d[g2].border_points.clear();
+    d[g2].sol_edges.clear();
+    d[g2].nPos = 0;
+    d[g2].nNeg = 0;
+    d[g2].cost = 0;
+    
+    for( unsigned int p = 0; p < s[g1].points.size(); p++ )
+        d[g1].points.push_back( s[g1].points[p] );
+    for( unsigned int p = 0; p < s[g2].points.size(); p++ )
+        d[g2].points.push_back( s[g2].points[p] );
+    
+    for( unsigned int p = 0; p < s[g1].border_points.size(); p++ )
+        d[g1].border_points.push_back( s[g1].border_points[p] );
+    for( unsigned int p = 0; p < s[g2].border_points.size(); p++ )
+        d[g2].border_points.push_back( s[g2].border_points[p] );
+    
+    for( unsigned int p = 0; p < s[g1].sol_edges.size(); p++ )
+        d[g1].sol_edges.push_back( s[g1].sol_edges[p] );
+    for( unsigned int p = 0; p < s[g2].sol_edges.size(); p++ )
+        d[g2].sol_edges.push_back( s[g2].sol_edges[p] );
+    
+    d[g1].nPos = s[g1].nPos;
+    d[g1].nNeg = s[g1].nNeg;
+    d[g1].border = s[g1].border;
+    d[g1].cost = s[g1].cost;
+    
+    d[g2].nPos = s[g2].nPos;
+    d[g2].nNeg = s[g2].nNeg;
+    d[g2].border = s[g2].border;
+    d[g2].cost = s[g2].cost;
+    
+}
+
 void LocalSearch::setCostFunction(CostFunction * cF)
 {
     _cF = cF;
@@ -89,7 +134,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, int w, int h)
     
     while( !wasImprooved && combinations.size() > 0 )
     {
-        /* Selects two random groups from the availiable combinations array*/
+        /* Selects two random groups from the availiable combinations array */
         int tupleInd = rand() % combinations.size();
         
         int g1 = combinations[ tupleInd ].g1;
@@ -108,7 +153,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, int w, int h)
         {
             if(n1 < currentSolutionCost)
             {
-                CloneSolution(neighborSolution1, currentSolution);
+                ClonePartialSolution(neighborSolution1, currentSolution, g1, g2);
                 CloneSolution(currentSolution, neighborSolution2);
                 CloneSolution(currentSolution, neighborSolution3);
                 CloneSolution(currentSolution, neighborSolution4);
@@ -119,7 +164,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, int w, int h)
         {
             if(n2 < currentSolutionCost)
             {
-                CloneSolution(neighborSolution2, currentSolution);
+                ClonePartialSolution(neighborSolution2, currentSolution, g1, g2);
                 CloneSolution(currentSolution, neighborSolution1);
                 CloneSolution(currentSolution, neighborSolution3);
                 CloneSolution(currentSolution, neighborSolution4);
@@ -130,7 +175,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, int w, int h)
         {
             if( n3 < currentSolutionCost )
             {
-                CloneSolution(neighborSolution3, currentSolution);
+                ClonePartialSolution(neighborSolution3, currentSolution, g1, g2);
                 CloneSolution(currentSolution, neighborSolution1);
                 CloneSolution(currentSolution, neighborSolution2);
                 CloneSolution(currentSolution, neighborSolution4);
@@ -141,7 +186,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, int w, int h)
         {
             if( n4 < currentSolutionCost )
             {
-                CloneSolution(neighborSolution4, currentSolution);
+                ClonePartialSolution(neighborSolution4, currentSolution, g1, g2);
                 CloneSolution(currentSolution, neighborSolution1);
                 CloneSolution(currentSolution, neighborSolution2);
                 CloneSolution(currentSolution, neighborSolution3);
@@ -151,6 +196,7 @@ void LocalSearch::Run( std::vector<Group>& currentSolution, int k, int w, int h)
         
     }
     
+    combinations.clear();
     neighborSolution1.clear();
     neighborSolution2.clear();
     neighborSolution3.clear();

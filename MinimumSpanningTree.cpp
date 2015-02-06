@@ -18,6 +18,31 @@ MinimumSpanningTree::MinimumSpanningTree( std::vector<Point>& vertices,  std::ve
     setInstance(vertices, borders);
 }
 
+int MinimumSpanningTree::find( int i )
+{
+    if( subsets[i].parentId != i )
+        subsets[i].parentId = find(subsets[i].parentId);
+    
+    return subsets[i].parentId;
+}
+
+void MinimumSpanningTree::Union(int x, int y)
+{
+    int xroot = find(x);
+    int yroot = find(y);
+    
+    if (subsets[xroot].rank < subsets[yroot].rank)
+        subsets[xroot].parentId = yroot;
+    else if (subsets[xroot].rank > subsets[yroot].rank)
+        subsets[yroot].parentId = xroot;
+    
+    else
+    {
+        subsets[yroot].parentId = xroot;
+        subsets[xroot].rank++;
+    }
+}
+
 void MinimumSpanningTree::CreateEdges()
 {
     /* Complete Graph - n^2 edges */
@@ -91,20 +116,19 @@ double MinimumSpanningTree::ComputeMST( std::vector<Edge>& spanningTreeEdges )
                 continue;
         }
         
-        int g1, g2;
-        g1 = edges[i].p1->group_n;
-        g2 = edges[i].p2->group_n;
+        int i1, i2;
+        i1 = edges[i].p1->group_n;
+        i2 = edges[i].p2->group_n;
+        
+        int g1 = find(i1);
+        int g2 = find(i2);
         
         if( g1 != g2 )
         {
             spanningTreeEdges.push_back(edges[i]);
             cost += edges[i].cost;
             
-            for(unsigned int j = 0; j < vertices.size(); j++)
-            {
-                if(vertices[j]->group_n == g1)
-                    vertices[j]->group_n = g2;
-            }
+            Union( g1, g2 );
         }
         if( spanningTreeEdges.size() == mst_size )
             break;
@@ -125,12 +149,19 @@ void MinimumSpanningTree::setInstance(std::vector<Point>& v,std::vector<Point>& 
 {
     vertices.clear();
     borders.clear();
+    subsets.clear();
+    
     int pos = 0, neg = 0;
     
     for( unsigned int i = 0; i < v.size(); i++ )
     {
         vertices.push_back(&v[i]);
         vertices[i]->group_n = i;
+        
+        Subset s;
+        s.parentId = i;
+        s.rank = 0;
+        subsets.push_back(s);
         
         if( v[i].type == POS_RESIDUE )
             pos++;
@@ -142,6 +173,10 @@ void MinimumSpanningTree::setInstance(std::vector<Point>& v,std::vector<Point>& 
     {
         borders.push_back(&b[i]);
         borders[i]->group_n = (int)v.size() + i;
+        Subset s;
+        s.parentId = (int)v.size() + i;
+        s.rank = 0;
+        subsets.push_back(s);
     }
     
     if( pos == neg )

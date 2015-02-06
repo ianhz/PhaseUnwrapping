@@ -16,6 +16,12 @@
 #include "CostFunction.h"
 #include <vector>
 
+struct subset
+{
+    int parentId;
+    int rank;
+}; typedef struct subset Subset;
+
 bool sortFunction( Edge e1, Edge e2 );
 
 class MinimumSpanningTree : public CostFunction
@@ -29,12 +35,15 @@ public:
     double ComputeCost();
     
 private:
+    int find( int i );
+    void Union( int x, int y );
     void CreateEdges();
     double cost = 0.0;
     bool balanced = false;
     std::vector<Edge> edges;
     std::vector<Point *> vertices;
     std::vector<Point *> borders;
+    std::vector<Subset> subsets;
 };
 
 #endif /* defined(__PhaseUnwrapping__MinimumSpanningTree__) */

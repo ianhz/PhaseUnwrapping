@@ -26,20 +26,14 @@ void DepthFirstSearch(std::vector<Point>& points, std::vector<Edge>& edges, Poin
         if(!edges[i].valid)
             continue;
         
-        Point * origin, * destination;
+        Point * destination;
         
         if( (edges[i].p1->i == start->i && edges[i].p1->j == start->j) || (edges[i].p2->i == start->i && edges[i].p2->j == start->j))
         {
             if( (edges[i].p1->i == start->i && edges[i].p1->j == start->j))
-            {
-                origin = edges[i].p1;
                 destination = edges[i].p2;
-            }
             else
-            {
                 destination = edges[i].p1;
-                origin = edges[i].p2;
-            }
             
             if(!destination->visited && !edges[i].visited)
             {

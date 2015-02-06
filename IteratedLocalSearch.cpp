@@ -8,9 +8,10 @@
 
 #include "IteratedLocalSearch.h"
 #define MAX_ITERATIONS 100
-#define SHAKE 20
+#define SHAKE 3
 #define NUM_POINTS_CHANGE 4
 #define SHAKE_NUM 10
+#define MAX_EDGE_COST 4 
 
 void IteratedLocalSearch::Shake( std::vector<Group>& solution  )
 {
@@ -81,6 +82,8 @@ void IteratedLocalSearch::RunMethod()
     {
         for(unsigned int k = 0; k < bestSolution[i].points.size(); k++)
             bestSolution[i].points[k].visited = false;
+        for(unsigned int k = 0; k < bestSolution[i].border_points.size(); k++)
+            bestSolution[i].border_points[k].visited = false;
         
         for(unsigned int k = 0; k < bestSolution[i].sol_edges.size(); k++)
             bestSolution[i].sol_edges[k].visited = false;
@@ -93,6 +96,8 @@ void IteratedLocalSearch::RunMethod()
             
             for(unsigned int k = 0; k < bestSolution[i].points.size(); k++)
                 bestSolution[i].points[k].visited = false;
+            for(unsigned int k = 0; k < bestSolution[i].border_points.size(); k++)
+                bestSolution[i].border_points[k].visited = false;
             
             for(unsigned int k = 0; k < bestSolution[i].sol_edges.size(); k++)
                 bestSolution[i].sol_edges[k].visited = false;

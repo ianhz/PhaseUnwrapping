@@ -14,7 +14,7 @@
 #include "LocalSearch.h"
 #include "MinimumSpanningTree.h"
 
-#define MAX_DIST 35
+#define MAX_DIST 20
 
 double C_Relocate( std::vector<Group>& currentSolution, int g1, int g2, double currentCost );
 
