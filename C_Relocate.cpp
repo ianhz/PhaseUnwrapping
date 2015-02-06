@@ -55,7 +55,7 @@ double C_Relocate( std::vector<Group>& currentSolution, int g1, int g2, double c
     CloneSolution(currentSolution, neighbor);
     CostFunction * _cF = new MinimumSpanningTree();
     
-    /* Tries to swap pairs +- from group g1 to group g2 */
+    /* Tries to relocate pairs +- from group g1 to group g2 */
     for( unsigned int i = 0; i < currentSolution[g1].points.size(); i++ )
     {
         int p1_type = currentSolution[g1].points[i].type;
