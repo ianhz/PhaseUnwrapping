@@ -41,11 +41,17 @@ int main(int argc, const char * argv[])
         method = new Goldstein();
     else
     {
-        printf("Invalid method...Exiting!\n\n)");
+        printf("Invalid method...Exiting!\n\n");
         return 0;
     }
     
     float * buffer = loadCSV(folderPath + fileName + ".csv", h, w);
+    
+    if(!buffer)
+    {
+        printf("File not found...Exiting!\n\n");
+        return 0;
+    }
     float * mask = loadCSV(folderPath + fileName + "_mask.csv", h, w);
     
     if(!mask)
